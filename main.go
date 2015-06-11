@@ -1,4 +1,4 @@
-package pcpeer
+package main
 
 import "github.com/tinzenite/core"
 
