@@ -1,20 +1,29 @@
 package main
 
-import "github.com/tinzenite/core"
+import (
+	"log"
 
-// TODO check what Golang offers us to help here
-const configPath = ""
+	"github.com/tinzenite/core"
+)
+
+const path = "/home/tamino/Music"
 
 func main() {
-	context, _ := loadContext()
-	// just run core for now
-	core.Run(*context)
-}
-
-// loadContext or create a new one if required. If new will save it.
-func loadContext() (*core.Context, error) {
-	// create new context to use
-	context, err := core.NewContext("NewTest")
-	// TODO check if one already exists, if yes use it. Otherwise create new one and save it.
-	return context, err
+	var context *core.Context
+	var err error
+	if core.IsTinzenite(path) {
+		context, err = core.Load(path)
+	} else {
+		context, err = core.Create("Test", path)
+	}
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+	err = context.Run()
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+	context.Kill()
 }
