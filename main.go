@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
 
 	"github.com/tinzenite/core"
 )
@@ -9,21 +11,17 @@ import (
 const path = "/home/tamino/Music"
 
 func main() {
-	var context *core.Context
-	var err error
-	if core.IsTinzenite(path) {
-		context, err = core.Load(path)
-	} else {
-		context, err = core.Create("Test", path)
-	}
+
+	channel, err := core.CreateChannel("TestMe", nil)
 	if err != nil {
-		log.Fatal(err.Error())
-		return
+		panic(err)
 	}
-	err = context.Run()
-	if err != nil {
-		log.Fatal(err.Error())
-		return
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	address, _ := channel.Address()
+	log.Println("ID:\n" + address)
+	select {
+	case <-c:
+		channel.Close()
 	}
-	context.Kill()
 }
