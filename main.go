@@ -12,6 +12,10 @@ const path = "/home/tamino/Music"
 
 func main() {
 
+	if !test() {
+		return
+	}
+
 	channel, err := core.CreateChannel("TestMe", nil)
 	if err != nil {
 		panic(err)
@@ -24,4 +28,10 @@ func main() {
 	case <-c:
 		channel.Close()
 	}
+}
+
+func test() bool {
+	_, err := core.CreateTinzenite(path, false)
+	log.Println(err.Error())
+	return false
 }
