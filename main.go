@@ -8,7 +8,9 @@ import (
 	"github.com/tinzenite/core"
 )
 
+const name = "music"
 const path = "/home/tamino/Music"
+const user = "Xamino"
 
 func main() {
 
@@ -31,7 +33,9 @@ func main() {
 }
 
 func test() bool {
-	_, err := core.CreateTinzenite(path, false)
-	log.Println(err.Error())
+	_, err := core.CreateTinzenite(name, path, "shana", user, false)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return false
 }
