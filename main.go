@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"time"
 
 	"github.com/tinzenite/core"
 )
@@ -14,35 +15,72 @@ const path = "/home/tamino/Music"
 const user = "Xamino"
 
 func main() {
+	// model()
+	// walkTest()
+	// channel()
+	tinzenite()
+}
 
-	if !walkTest() {
-		return
-	}
+func model() {
+	core.Model("/home/tamino")
+}
 
-	channel, err := core.CreateChannel("TestMe", nil)
+type t struct {
+}
+
+func (*t) CallbackMessage(address, message string) {
+	log.Println("Incomming: " + message)
+}
+
+func (*t) CallbackNewConnection(address, message string) {
+	log.Println("Accepting: " + message)
+}
+
+func channel() {
+	channel, err := core.CreateChannel("test", nil, &t{})
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
+		return
 	}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	address, _ := channel.Address()
 	log.Println("ID:\n" + address)
-	select {
-	case <-c:
-		channel.Close()
+	for {
+		select {
+		case <-c:
+			channel.Close()
+			goto exit
+		case <-time.Tick(10 * time.Second):
+			err := channel.Send("ed284a9fa07142cb8f6fa8c821d7f722cf63d2c7f74390566c6949bdb898b33e", "Tick!")
+			if err != nil {
+				log.Println(err.Error())
+			}
+		}
 	}
+exit:
 }
 
-func test() bool {
-	_, err := core.CreateTinzenite(name, path, "shana", user, false)
+func tinzenite() bool {
+	tinzenite, err := core.CreateTinzenite(name, path, "shana", user, false)
 	if err == core.ErrIsTinzenite {
 		err = core.RemoveTinzenite(path)
 		if err != nil {
 			log.Println(err.Error())
 		}
+		return false
 	}
 	if err != nil {
 		log.Println(err.Error())
+		return false
+	}
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	address := tinzenite.Address()
+	log.Println("ID:\n" + address)
+	select {
+	case <-c:
+		tinzenite.Close()
 	}
 	return false
 }
