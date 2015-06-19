@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 
 	"github.com/tinzenite/core"
 )
@@ -51,34 +50,21 @@ func test() bool {
 func walkTest() bool {
 	testpath := "/home/tamino/Programming"
 	ignorepath := "/home/tamino"
-	list, err := core.ReadTinIgnore(ignorepath)
+	matcher, err := core.CreateMatcher(ignorepath)
 	if err != nil {
 		log.Println(err.Error())
 		return false
 	}
-	var dir int
-	var count, file int64
+	var objects int
+	var count int64
 	filepath.Walk(testpath, func(path string, info os.FileInfo, err error) error {
-		for _, line := range list {
-			isDirLine := strings.HasPrefix(line, "/")
-			// check dir only against dir candidates
-			if isDirLine && info.IsDir() {
-				if strings.HasSuffix(path, line) {
-					dir++
-					// no need to walk the dir if we ignore it
-					return filepath.SkipDir
-				}
-			} else if !isDirLine && !info.IsDir() {
-				// check file only against file ^^
-				if strings.HasSuffix(path, line) {
-					file += info.Size()
-					return nil
-				}
-			}
+		if matcher.Ignore(path) {
+			objects++
+			return filepath.SkipDir
 		}
 		count += info.Size()
 		return nil
 	})
-	log.Printf("Kept %dkb worth of objects, ignored %d directories and %dkb worth of files\n", count/1024, dir, file/1024)
+	log.Printf("Kept %dkb worth of objects, ignored %d objects\n", count/1024, objects)
 	return false
 }
