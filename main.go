@@ -15,14 +15,18 @@ const path = "/home/tamino/Music"
 const user = "Xamino"
 
 func main() {
-	// model()
+	model()
 	// walkTest()
 	// channel()
-	tinzenite()
+	// tinzenite()
 }
 
 func model() {
-	core.Model("/home/tamino")
+	start := time.Now()
+	core.Model("/home/tamino/Documents")
+	elapsed := time.Since(start)
+	elapsed = elapsed / time.Millisecond
+	log.Printf("Took %d msec\n", elapsed)
 }
 
 type t struct {
