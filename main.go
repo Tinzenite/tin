@@ -23,9 +23,13 @@ func main() {
 
 func model() {
 	start := time.Now()
-	core.Model("/home/tamino/Documents")
+	m, err := core.LoadModel(path)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	elapsed := time.Since(start)
 	elapsed = elapsed / time.Millisecond
+	log.Printf("Output:\n\n%s\n", m.String())
 	log.Printf("Took %d msec\n", elapsed)
 }
 
