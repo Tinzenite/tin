@@ -39,7 +39,7 @@ func model() {
 	go func() {
 		for {
 			update := <-updates
-			log.Printf("Update received! Type: %s\n%+v\n", update.Operation, update.Object)
+			log.Printf("Update received!\nType: %s\nContent: %+v\n", update.Operation, update.Object)
 		}
 	}()
 	// now allow manual operations
