@@ -45,7 +45,10 @@ func model() {
 			log.Println(err.Error())
 		}
 		log.Printf("Updated? %v\n", updated)
-		log.Printf("Output:\n\n%s\n", m.String())
+		if updated {
+			log.Printf("Output:\n\n%s\n", m.String())
+		}
+		log.Println("------------------------------------------------")
 	}
 }
 
