@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/tinzenite/core"
@@ -31,6 +33,20 @@ func model() {
 	elapsed = elapsed / time.Millisecond
 	log.Printf("Output:\n\n%s\n", m.String())
 	log.Printf("Took %d msec\n", elapsed)
+	// now allow manual operations
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		input, _ := reader.ReadString('\n')
+		if strings.Contains(input, "exit") {
+			break
+		}
+		updated, err := m.Update()
+		if err != nil {
+			log.Println(err.Error())
+		}
+		log.Printf("Updated? %v\n", updated)
+		log.Printf("Output:\n\n%s\n", m.String())
+	}
 }
 
 type t struct {
