@@ -33,6 +33,15 @@ func model() {
 	elapsed = elapsed / time.Millisecond
 	log.Printf("Output:\n\n%s\n", m.String())
 	log.Printf("Took %d msec\n", elapsed)
+	// register channel for updates
+	updates := make(chan core.UpdateMessage, 1)
+	m.Register(updates)
+	go func() {
+		for {
+			update := <-updates
+			log.Printf("Update received! Type: %s\n", update.Operation)
+		}
+	}()
 	// now allow manual operations
 	reader := bufio.NewReader(os.Stdin)
 	for {
