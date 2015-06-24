@@ -39,7 +39,7 @@ func model() {
 	go func() {
 		for {
 			update := <-updates
-			log.Printf("Update received! Type: %s\n", update.Operation)
+			log.Printf("Update received! Type: %s\n%+v\n", update.Operation, update.Object)
 		}
 	}()
 	// now allow manual operations
@@ -49,15 +49,12 @@ func model() {
 		if strings.Contains(input, "exit") {
 			break
 		}
-		updated, err := m.Update()
+		err := m.Update()
 		if err != nil {
 			log.Println(err.Error())
 		}
-		log.Printf("Updated? %v\n", updated)
-		if updated {
-			log.Printf("Output:\n\n%s\n", m.String())
-		}
-		log.Println("------------------------------------------------")
+		// log.Printf("Output:\n\n%s\n", m.String())
+		log.Println("Updated")
 	}
 }
 
