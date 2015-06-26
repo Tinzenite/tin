@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -32,15 +31,17 @@ func model() {
 	}
 	elapsed := time.Since(start)
 	elapsed = elapsed / time.Millisecond
-	log.Printf("Output:\n\n%s\n", m.String())
+	// log.Printf("Output:\n\n%s\n", m.String())
 	log.Printf("Took %d msec\n", elapsed)
-	obj, err := m.Read()
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	bin, _ := json.MarshalIndent(obj, "", "  ")
-	log.Println(string(bin))
+	/*
+		obj, err := m.Read()
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		bin, _ := json.MarshalIndent(obj, "", "  ")
+		log.Println(string(bin))
+	*/
 	// register channel for updates
 	updates := make(chan core.UpdateMessage, 1)
 	m.Register(updates)
@@ -57,12 +58,14 @@ func model() {
 		if strings.Contains(input, "exit") {
 			break
 		}
+		start := time.Now()
 		err := m.Update()
+		elapsed := time.Since(start)
 		if err != nil {
 			log.Println(err.Error())
 		}
 		// log.Printf("Output:\n\n%s\n", m.String())
-		log.Println("Updated")
+		log.Printf("Updated in %s\n", elapsed)
 	}
 }
 
