@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -33,6 +34,13 @@ func model() {
 	elapsed = elapsed / time.Millisecond
 	log.Printf("Output:\n\n%s\n", m.String())
 	log.Printf("Took %d msec\n", elapsed)
+	obj, err := m.Read()
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	bin, _ := json.MarshalIndent(obj, "", "  ")
+	log.Println(string(bin))
 	// register channel for updates
 	updates := make(chan core.UpdateMessage, 1)
 	m.Register(updates)
