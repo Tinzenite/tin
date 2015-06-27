@@ -17,10 +17,10 @@ const path = "/home/tamino/Music"
 const user = "Xamino"
 
 func main() {
-	model()
+	// model()
 	// walkTest()
 	// channel()
-	// tinzenite()
+	tinzenite()
 }
 
 func model() {
@@ -106,26 +106,50 @@ exit:
 }
 
 func tinzenite() bool {
-	tinzenite, err := core.CreateTinzenite(name, path, "shana", user, false)
-	if err == core.ErrIsTinzenite {
-		err = core.RemoveTinzenite(path)
-		if err != nil {
-			log.Println(err.Error())
-		}
-		return false
+	var tinzenite *core.Tinzenite
+	var err error
+	if core.IsTinzenite(path) {
+		log.Println("Loading existing.")
+		tinzenite, err = core.LoadTinzenite(path)
+	} else {
+		log.Println("Creating new.")
+		tinzenite, err = core.CreateTinzenite(name, path, "shana", user)
 	}
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Failed to start: " + err.Error())
 		return false
 	}
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
 	address := tinzenite.Address()
 	log.Println("ID:\n" + address)
-	select {
-	case <-c:
-		tinzenite.Close()
+	// now allow manual operations
+	reader := bufio.NewReader(os.Stdin)
+	run := true
+	for run {
+		input, _ := reader.ReadString('\n')
+		input = strings.Trim(input, "\n")
+		switch input {
+		case "store":
+			err := tinzenite.Store()
+			if err != nil {
+				log.Println(err.Error())
+			} else {
+				log.Println("OK")
+			}
+		case "sync":
+			err := tinzenite.SyncModel()
+			if err != nil {
+				log.Println(err.Error())
+			} else {
+				log.Println("OK")
+			}
+		case "exit":
+			log.Println("Exiting!")
+			run = false
+		default:
+			log.Println("Unknown command.")
+		}
 	}
+	tinzenite.Close()
 	return false
 }
 
