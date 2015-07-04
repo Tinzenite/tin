@@ -12,6 +12,7 @@ import (
 const name = "music"
 const path = "/home/tamino/Music"
 const user = "Xamino"
+const password = "hunter2"
 
 func main() {
 	tinzenite()
@@ -22,10 +23,10 @@ func tinzenite() bool {
 	var err error
 	if core.IsTinzenite(path) {
 		log.Println("Loading existing.")
-		tinzenite, err = core.LoadTinzenite(path)
+		tinzenite, err = core.LoadTinzenite(path, password)
 	} else {
 		log.Println("Creating new.")
-		tinzenite, err = core.CreateTinzenite(name, path, "shana", user)
+		tinzenite, err = core.CreateTinzenite(name, path, "shana", user, password)
 	}
 	if err != nil {
 		log.Println("Failed to start: " + err.Error())
