@@ -49,12 +49,23 @@ func tinzenite() bool {
 				log.Println("OK")
 			}
 		case "sync":
-			err := tinzenite.SyncModel()
+			err := tinzenite.Sync()
 			if err != nil {
 				log.Println(err.Error())
 			} else {
 				log.Println("OK")
 			}
+		case "update":
+			err := tinzenite.SyncLocal()
+			if err != nil {
+				log.Println(err.Error())
+			} else {
+				log.Println("OK")
+			}
+		case "clear":
+			os.RemoveAll(tinzenite.Path + "/.tinzenite/temp")
+			os.Mkdir(tinzenite.Path+"/.tinzenite/temp", 0777)
+			log.Println("OK")
 		case "exit":
 			log.Println("Exiting!")
 			run = false
