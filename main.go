@@ -33,8 +33,8 @@ func tinzenite() bool {
 		log.Println("Failed to start: " + err.Error())
 		return false
 	}
-	address := tinzenite.Address()
-	log.Println("ID:\n" + address)
+	// if all ok, register callback
+	tinzenite.RegisterPeerValidation(acceptPeer)
 	// now allow manual operations
 	reader := bufio.NewReader(os.Stdin)
 	run := true
@@ -42,6 +42,9 @@ func tinzenite() bool {
 		input, _ := reader.ReadString('\n')
 		input = strings.Trim(input, "\n")
 		switch input {
+		case "id":
+			address := tinzenite.Address()
+			log.Println("ID:\n" + address)
 		case "store":
 			err := tinzenite.Store()
 			if err != nil {
@@ -76,4 +79,9 @@ func tinzenite() bool {
 	}
 	tinzenite.Close()
 	return false
+}
+
+func acceptPeer(address string, wantsTrust bool) bool {
+	log.Printf("Accepting <%s>, wants trust: %+v.\n", address, wantsTrust)
+	return true
 }
