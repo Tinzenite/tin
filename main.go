@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"log"
 	"os"
 	"strings"
@@ -10,14 +11,16 @@ import (
 	"github.com/tinzenite/shared"
 )
 
-const name = "music"
-const path = "/home/tamino/Music"
 const user = "Xamino"
 const password = "hunter2"
+
+var path string
+var name string
 
 var reader *bufio.Reader
 
 func main() {
+	parseFlags()
 	var tinzenite *core.Tinzenite
 	var err error
 	if shared.IsTinzenite(path) {
@@ -31,6 +34,7 @@ func main() {
 		log.Println("Failed to start:", err)
 		return
 	}
+	log.Println("Ready.")
 	// prepare global console reader (before register because it may directly need it)
 	reader = bufio.NewReader(os.Stdin)
 	// if all ok, register callback
@@ -40,10 +44,22 @@ func main() {
 	for run {
 		input, _ := reader.ReadString('\n')
 		input = strings.Trim(input, "\n")
+		// special case to connect because we need to read the address
+		if strings.HasPrefix(input, "connect") {
+			address := strings.Split(input, " ")[1]
+			err := tinzenite.Connect(address)
+			if err != nil {
+				log.Println(err)
+			}
+			log.Println("Requested to", address)
+			continue
+		}
 		switch input {
 		case "id":
 			address := tinzenite.Address()
 			log.Println("ID:\n" + address)
+		case "info":
+			log.Println("Path:", tinzenite.Path)
 		case "store":
 			err := tinzenite.Store()
 			if err != nil {
@@ -95,4 +111,14 @@ func acceptPeer(address string, wantsTrust bool) bool {
 		}
 	}
 	// return false <-- can never be reached
+}
+
+func parseFlags() {
+	// define
+	flag.StringVar(&path, "path", "/home/tamino/Music", "Path of where to run Tinzenite.")
+	backup, _ := shared.NewIdentifier()
+	flag.StringVar(&name, "name", backup, "Name of the Tinzenite peer.")
+	// important: apply
+	flag.Parse()
+	log.Println("Starting at", path, "as", name)
 }
