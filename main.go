@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/tinzenite/core"
+	"github.com/tinzenite/shared"
 )
 
 const name = "music"
@@ -21,7 +22,7 @@ func main() {
 func tinzenite() bool {
 	var tinzenite *core.Tinzenite
 	var err error
-	if core.IsTinzenite(path) {
+	if shared.IsTinzenite(path) {
 		log.Println("Loading existing.")
 		tinzenite, err = core.LoadTinzenite(path, password)
 	} else {
