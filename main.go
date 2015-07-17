@@ -52,14 +52,14 @@ func tinzenite() bool {
 		case "sync":
 			err := tinzenite.Sync()
 			if err != nil {
-				log.Println(err.Error())
+				log.Println("Sync:", err)
 			} else {
 				log.Println("OK")
 			}
 		case "update":
 			err := tinzenite.SyncLocal()
 			if err != nil {
-				log.Println(err.Error())
+				log.Println("SyncLocal:", err)
 			} else {
 				log.Println("OK")
 			}
