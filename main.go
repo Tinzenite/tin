@@ -15,11 +15,9 @@ const path = "/home/tamino/Music"
 const user = "Xamino"
 const password = "hunter2"
 
-func main() {
-	tinzenite()
-}
+var reader *bufio.Reader
 
-func tinzenite() bool {
+func main() {
 	var tinzenite *core.Tinzenite
 	var err error
 	if shared.IsTinzenite(path) {
@@ -30,13 +28,14 @@ func tinzenite() bool {
 		tinzenite, err = core.CreateTinzenite(name, path, "shana", user, password)
 	}
 	if err != nil {
-		log.Println("Failed to start: " + err.Error())
-		return false
+		log.Println("Failed to start:", err)
+		return
 	}
+	// prepare global console reader (before register because it may directly need it)
+	reader = bufio.NewReader(os.Stdin)
 	// if all ok, register callback
 	tinzenite.RegisterPeerValidation(acceptPeer)
 	// now allow manual operations
-	reader := bufio.NewReader(os.Stdin)
 	run := true
 	for run {
 		input, _ := reader.ReadString('\n')
@@ -78,10 +77,22 @@ func tinzenite() bool {
 		}
 	}
 	tinzenite.Close()
-	return false
 }
 
 func acceptPeer(address string, wantsTrust bool) bool {
 	log.Printf("Accepting <%s>, wants trust: %+v.\n", address, wantsTrust)
-	return true
+	var input string
+	for {
+		switch input {
+		case "accept":
+			return true
+		case "deny":
+			return false
+		default:
+			log.Println("Accept with <accept>, deny with <deny>. All else will be ignored.")
+			input, _ = reader.ReadString('\n')
+			input = strings.Trim(input, "\n")
+		}
+	}
+	// return false <-- can never be reached
 }
