@@ -24,10 +24,10 @@ func main() {
 	var tinzenite *core.Tinzenite
 	var err error
 	if shared.IsTinzenite(path) {
-		log.Println("Loading existing.")
+		log.Println("Loading existing Tinzenite.")
 		tinzenite, err = core.LoadTinzenite(path, password)
 	} else {
-		log.Println("Creating new.")
+		log.Println("Creating new Tinzenite.")
 		tinzenite, err = core.CreateTinzenite("test", path, name, user, password)
 	}
 	if err != nil {
