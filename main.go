@@ -28,7 +28,7 @@ func main() {
 		tinzenite, err = core.LoadTinzenite(path, password)
 	} else {
 		log.Println("Creating new.")
-		tinzenite, err = core.CreateTinzenite(name, path, "shana", user, password)
+		tinzenite, err = core.CreateTinzenite("test", path, name, user, password)
 	}
 	if err != nil {
 		log.Println("Failed to start:", err)
