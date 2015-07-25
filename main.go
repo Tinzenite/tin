@@ -56,7 +56,7 @@ func main() {
 		}
 		switch input {
 		case "id":
-			address := tinzenite.Address()
+			address, _ := tinzenite.Address()
 			log.Println("ID:\n" + address)
 		case "info":
 			log.Println("Path:", tinzenite.Path)
@@ -97,20 +97,7 @@ func main() {
 
 func acceptPeer(address string, wantsTrust bool) bool {
 	log.Printf("Accepting <%s>, wants trust: %+v.\n", address, wantsTrust)
-	var input string
-	for {
-		switch input {
-		case "accept":
-			return true
-		case "deny":
-			return false
-		default:
-			log.Println("Accept with <accept>, deny with <deny>. All else will be ignored.")
-			input, _ = reader.ReadString('\n')
-			input = strings.Trim(input, "\n")
-		}
-	}
-	// return false <-- can never be reached
+	return true
 }
 
 func parseFlags() {
