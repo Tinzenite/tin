@@ -85,6 +85,8 @@ func main() {
 			os.RemoveAll(tinzenite.Path + "/.tinzenite/temp")
 			os.Mkdir(tinzenite.Path+"/.tinzenite/temp", 0777)
 			log.Println("OK")
+		case "status":
+			log.Println(tinzenite.PrintStatus())
 		case "exit":
 			log.Println("Exiting!")
 			run = false
