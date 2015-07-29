@@ -19,14 +19,70 @@ var path string
 var name string
 var flagBoot bool
 
-var reader *bufio.Reader
-
 func main() {
 	parseFlags()
 	if flagBoot {
 		bootstrapDirectory()
 		return
 	}
+	tinzeniteDirectory()
+}
+
+func bootstrapDirectory() {
+	var boot *bootstrap.Bootstrap
+	var err error
+	if shared.IsTinzenite(path) {
+		log.Println("Loading bootstrap")
+		boot, err = bootstrap.Load(path, onSuccessfulBootstrap)
+	} else {
+		log.Println("Creating bootstrap")
+		boot, err = bootstrap.Create(path, name, onSuccessfulBootstrap)
+	}
+	if err != nil {
+		log.Println("Bootstrap:", err)
+		return
+	}
+	boot.Store()
+	// read input
+	reader := bufio.NewReader(os.Stdin)
+	run := true
+	for run {
+		input, _ := reader.ReadString('\n')
+		input = strings.Trim(input, "\n")
+		if strings.HasPrefix(input, "connect") {
+			address := strings.Split(input, " ")[1]
+			err := boot.Start(address)
+			if err != nil {
+				log.Println("Start:", err)
+			}
+			log.Println("Connecting.")
+			continue
+		}
+		switch input {
+		case "store":
+			boot.Store()
+			log.Println("Stored.")
+		case "exit":
+			boot.Store()
+			boot.Close()
+			run = false
+		case "status":
+			log.Println(boot.PrintStatus())
+		default:
+			log.Println("CMD UNKNOWN")
+		}
+	}
+	log.Println("DONE")
+}
+
+/*
+For now just start tinzenite
+*/
+func onSuccessfulBootstrap() {
+	tinzeniteDirectory()
+}
+
+func tinzeniteDirectory() {
 	var tinzenite *core.Tinzenite
 	var err error
 	if shared.IsTinzenite(path) {
@@ -42,7 +98,7 @@ func main() {
 	}
 	log.Println("Ready.")
 	// prepare global console reader (before register because it may directly need it)
-	reader = bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(os.Stdin)
 	// if all ok, register callback
 	tinzenite.RegisterPeerValidation(acceptPeer)
 	// now allow manual operations
@@ -91,56 +147,6 @@ func main() {
 		}
 	}
 	tinzenite.Close()
-}
-
-func bootstrapDirectory() {
-	var boot *bootstrap.Bootstrap
-	var err error
-	if shared.IsTinzenite(path) {
-		log.Println("Loading bootstrap")
-		boot, err = bootstrap.Load(path)
-	} else {
-		log.Println("Creating bootstrap")
-		boot, err = bootstrap.Create(path, "booooty")
-	}
-	if err != nil {
-		log.Println("Bootstrap:", err)
-		return
-	}
-	boot.Store()
-	// read input
-	reader = bufio.NewReader(os.Stdin)
-	run := true
-	for run {
-		input, _ := reader.ReadString('\n')
-		input = strings.Trim(input, "\n")
-		if strings.HasPrefix(input, "connect") {
-			address := strings.Split(input, " ")[1]
-			err := boot.Start(address)
-			if err != nil {
-				log.Println("Start:", err)
-			}
-			log.Println("Connecting.")
-			continue
-		}
-		switch input {
-		case "store":
-			boot.Store()
-			log.Println("Stored.")
-		case "check":
-			boot.Check()
-			log.Println("Check.")
-		case "exit":
-			boot.Store()
-			boot.Close()
-			run = false
-		case "status":
-			log.Println(boot.PrintStatus())
-		default:
-			log.Println("CMD UNKNOWN")
-		}
-	}
-	log.Println("DONE")
 }
 
 func acceptPeer(address string, wantsTrust bool) bool {
