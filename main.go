@@ -44,16 +44,6 @@ func main() {
 	for run {
 		input, _ := reader.ReadString('\n')
 		input = strings.Trim(input, "\n")
-		// special case to connect because we need to read the address
-		if strings.HasPrefix(input, "connect") {
-			address := strings.Split(input, " ")[1]
-			err := tinzenite.Connect(address)
-			if err != nil {
-				log.Println(err)
-			}
-			log.Println("Requested to", address)
-			continue
-		}
 		switch input {
 		case "id":
 			address, _ := tinzenite.Address()
