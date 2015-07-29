@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tinzenite/bootstrap"
 	"github.com/tinzenite/core"
 	"github.com/tinzenite/shared"
 )
@@ -16,11 +17,16 @@ const password = "hunter2"
 
 var path string
 var name string
+var flagBoot bool
 
 var reader *bufio.Reader
 
 func main() {
 	parseFlags()
+	if flagBoot {
+		bootstrapDirectory()
+		return
+	}
 	var tinzenite *core.Tinzenite
 	var err error
 	if shared.IsTinzenite(path) {
@@ -87,6 +93,22 @@ func main() {
 	tinzenite.Close()
 }
 
+func bootstrapDirectory() {
+	var boot *bootstrap.Bootstrap
+	var err error
+	if shared.IsTinzenite(path) {
+		boot, err = bootstrap.Load(path)
+	} else {
+		boot, err = bootstrap.Create(path, "booooty")
+	}
+	if err != nil {
+		log.Println("Bootstrap:", err)
+		return
+	}
+	boot.Store()
+	log.Println("DONE")
+}
+
 func acceptPeer(address string, wantsTrust bool) bool {
 	log.Printf("Accepting <%s>, wants trust: %+v.\n", address, wantsTrust)
 	return true
@@ -94,6 +116,7 @@ func acceptPeer(address string, wantsTrust bool) bool {
 
 func parseFlags() {
 	// define
+	flag.BoolVar(&flagBoot, "bootstrap", false, "Flag whether to bootstrap to a network.")
 	flag.StringVar(&path, "path", "/home/tamino/Music", "Path of where to run Tinzenite.")
 	backup, _ := shared.NewIdentifier()
 	flag.StringVar(&name, "name", backup, "Name of the Tinzenite peer.")
