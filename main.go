@@ -97,8 +97,10 @@ func bootstrapDirectory() {
 	var boot *bootstrap.Bootstrap
 	var err error
 	if shared.IsTinzenite(path) {
+		log.Println("Loading bootstrap")
 		boot, err = bootstrap.Load(path)
 	} else {
+		log.Println("Creating bootstrap")
 		boot, err = bootstrap.Create(path, "booooty")
 	}
 	if err != nil {
@@ -122,5 +124,4 @@ func parseFlags() {
 	flag.StringVar(&name, "name", backup, "Name of the Tinzenite peer.")
 	// important: apply
 	flag.Parse()
-	log.Println("Starting at", path, "as", name)
 }
