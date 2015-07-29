@@ -108,6 +108,38 @@ func bootstrapDirectory() {
 		return
 	}
 	boot.Store()
+	// read input
+	reader = bufio.NewReader(os.Stdin)
+	run := true
+	for run {
+		input, _ := reader.ReadString('\n')
+		input = strings.Trim(input, "\n")
+		if strings.HasPrefix(input, "connect") {
+			address := strings.Split(input, " ")[1]
+			err := boot.Start(address)
+			if err != nil {
+				log.Println("Start:", err)
+			}
+			log.Println("Connecting.")
+			continue
+		}
+		switch input {
+		case "store":
+			boot.Store()
+			log.Println("Stored.")
+		case "check":
+			boot.Check()
+			log.Println("Check.")
+		case "exit":
+			boot.Store()
+			boot.Close()
+			run = false
+		case "status":
+			log.Println(boot.PrintStatus())
+		default:
+			log.Println("CMD UNKNOWN")
+		}
+	}
 	log.Println("DONE")
 }
 
