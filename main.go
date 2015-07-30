@@ -68,6 +68,9 @@ func bootstrapDirectory() {
 			run = false
 		case "status":
 			log.Println(boot.PrintStatus())
+		case "id":
+			address, _ := boot.Address()
+			log.Println(address)
 		default:
 			log.Println("CMD UNKNOWN")
 		}
