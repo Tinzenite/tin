@@ -18,8 +18,10 @@ func bootstrapTinzenite(path string) {
 	// wait group so that the process will wait for a successful bootstrap
 	var wg sync.WaitGroup
 	wg.Add(1)
+	var boot *bootstrap.Bootstrap
+	var err error
 	if shared.IsTinzenite(path) {
-		_, err := bootstrap.Load(path, func() {
+		boot, err = bootstrap.Load(path, func() {
 			log.Println("DEBUG: Success, now what?")
 			// on success --> notify of done
 			wg.Done()
@@ -31,7 +33,7 @@ func bootstrapTinzenite(path string) {
 		}
 	} else {
 		peerName := getString("Enter the peer name for this Tinzenite directory:")
-		boot, err := bootstrap.Create(path, peerName, func() {
+		boot, err = bootstrap.Create(path, peerName, func() {
 			log.Println("DEBUG: Success, now what?")
 			// on success --> notify of done
 			wg.Done()
@@ -54,6 +56,9 @@ func bootstrapTinzenite(path string) {
 			logMain("Bootstrap store error:", err.Error())
 		}
 	}
+	// print information
+	address, _ := boot.Address()
+	fmt.Printf("Bootstrapping.\nID: %s\n", address)
 	// wait for successful bootstrap
 	wg.Wait()
 	log.Println("DEBUG: can it be that this kills the successful function, leaving tinzenite hanging?")
@@ -74,6 +79,7 @@ func createTinzenite(path string) {
 		logMain("Creation error:", err.Error())
 		return
 	}
+	// run tinzenite until killed
 	runTinzenite(tinzenite)
 }
 
@@ -89,7 +95,6 @@ func loadTinzenite(path string) {
 		logMain("Loading error:", err.Error())
 		return
 	}
-	tinzenite.RegisterPeerValidation(allowPeer)
 	// run tinzenite until killed
 	runTinzenite(tinzenite)
 }
@@ -100,6 +105,8 @@ runTinzenite runs the given Tinzenite instance.
 TODO implement interrupts and close behaviour!
 */
 func runTinzenite(t *core.Tinzenite) {
+	// do this here so that it is guaranteed to be set
+	t.RegisterPeerValidation(allowPeer)
 	// print important info
 	address, _ := t.Address()
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
