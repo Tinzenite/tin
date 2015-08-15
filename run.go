@@ -13,7 +13,7 @@ func loadTinzenite(path string) {
 		logMain("Directory is not a valid Tinzenite directory!")
 		return
 	}
-	password := getInput("Please enter the directory password:")
+	password := getString("Please enter the directory password:")
 	tinzenite, err := core.LoadTinzenite(path, password)
 	if err != nil {
 		// TODO catch wrong password and allow retry

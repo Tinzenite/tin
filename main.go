@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"strings"
 
@@ -27,7 +28,7 @@ func main() {
 		command = cmdLoad
 	}
 	if path == "" {
-		log.Println("Need to ask for path!")
+		path = getPath()
 	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
 }
@@ -51,16 +52,37 @@ func getCmd() cmd {
 }
 
 func getPath() string {
+	// load available dirs
 	options, err := shared.ReadDirectoryList()
 	if err != nil {
 		logMain(err.Error())
 		return ""
 	}
+	// if none saved --> ask for manual entry
 	if len(options) == 0 {
-		log.Println("NONE AVAILABLE")
+		fmt.Println("No previous Tinzenite directories known.")
+		return getString("Enter path for new Tinzenite directory:")
 	}
-	log.Println("Choose which ")
-	return "ILLEGAL"
+	newQueston := createYesNo("Choose from existing paths?")
+	// if no --> manual entry
+	if newQueston.ask() < 0 {
+		return getString("Enter path for new Tinzenite directory:")
+	}
+	fmt.Println("Available paths:")
+	for index, path := range options {
+		// plus one for human readable numbers
+		fmt.Println(index+1, ":", path)
+	}
+	var pathIndex int
+	for {
+		pathIndex = getInt("Enter the corresponding number to choose a path:")
+		pathIndex-- // need to subtract one to undo human readable numbers
+		if pathIndex >= 0 && pathIndex < len(options) {
+			break
+		}
+		fmt.Println("Invalid choice. Choose between 1 and the maximum!")
+	}
+	return options[pathIndex]
 }
 
 /*

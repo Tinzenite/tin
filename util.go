@@ -4,19 +4,34 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
 /*
 getInput poses a request to the user and returns his entry.
 */
-func getInput(request string) string {
+func getString(request string) string {
 	fmt.Println(request)
 	// read input
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	input = strings.Trim(input, "\n")
 	return input
+}
+
+func getInt(request string) int {
+	for {
+		fmt.Println(request)
+		// read input
+		reader := bufio.NewReader(os.Stdin)
+		input, _ := reader.ReadString('\n')
+		input = strings.Trim(input, "\n")
+		value, err := strconv.ParseInt(input, 10, 0)
+		if err == nil {
+			return int(value)
+		}
+	}
 }
 
 /*

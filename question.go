@@ -31,7 +31,7 @@ createYesNo creates a question with predeclared Yes and No answer options. The
 Option for No is negative, for Yes positive.
 */
 func createYesNo(questionText string) *question {
-	question := &question{question: questionText, caseSensitive: false}
+	question := &question{question: "(Y/N) " + questionText, caseSensitive: false}
 	question.createAnswer(-1, "n", "no")
 	question.createAnswer(1, "y", "yes")
 	return question
