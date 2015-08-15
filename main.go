@@ -11,47 +11,58 @@ import (
 func main() {
 	log.Println("Starting client.")
 	// declare flags
-	var path = *flag.String("path", "", "File directory path in which to run the client.")
-	// read them
+	var commandString string
+	var path string
+	// write flag stuff
+	flag.StringVar(&path, "path", "", "File directory path in which to run the client.")
+	flag.StringVar(&commandString, "cmd", "none", "Command for the path: create, load, or bootstrap.")
+	// parse them
 	flag.Parse()
-	// ask which operation to do
+	// need to do some additional work because flag doesn't allow custom enumeration variables
+	command := cmdParse(commandString)
+	// TODO implement load as sane default where?
+	// make sure that path and command have been given, otherwise ask explicitely
+	if command != cmdNone {
+		log.Println("Command was given:", command)
+	} else {
+		log.Println("Default to load?")
+	}
+	if path != "" {
+		log.Println("Path was given:", path)
+	} else {
+		log.Println("Need to ask for path!")
+	}
+}
+
+func getCmd() cmd {
 	opQuestion := createQuestion("(L)oad a Tinzenite directory, (C)reate one, or (B)ootstrap to an existing one?")
 	opQuestion.createAnswer(0, "l", "load")
 	opQuestion.createAnswer(1, "c", "create")
 	opQuestion.createAnswer(2, "b", "bootstrap")
 	switch opQuestion.ask() {
 	case 0:
-		/*TODO load*/
-		log.Println("Load")
+		return cmdLoad
 	case 1:
-		/*TODO create*/
-		log.Println("Create")
+		return cmdCreate
 	case 2:
-		/*TODO bootstrap*/
-		log.Println("Bootstrap")
+		return cmdBootstrap
 	default:
 		log.Println("Question returned unknown operation!")
-		return
-	}
-	/*TODO continue here*/
-	log.Println("Done for now")
-	return
-	// if no path was given we need to read the directory list and let the user choose which dir to run
-	if path == "" {
-		options, err := shared.ReadDirectoryList()
-		if err != nil {
-			logMain(err.Error())
-			return
-		}
-		if len(options) == 0 {
-			log.Println("NONE AVAILABLE")
-		}
-		log.Println("Choose which ")
+		return cmdNone
 	}
 }
 
-func loadTinzenite(path string) {
-	log.Println("TODO")
+func getPath() string {
+	options, err := shared.ReadDirectoryList()
+	if err != nil {
+		logMain(err.Error())
+		return ""
+	}
+	if len(options) == 0 {
+		log.Println("NONE AVAILABLE")
+	}
+	log.Println("Choose which ")
+	return "ILLEGAL"
 }
 
 /*
