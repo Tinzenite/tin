@@ -20,6 +20,7 @@ func bootstrapTinzenite(path string) {
 	wg.Add(1)
 	if shared.IsTinzenite(path) {
 		_, err := bootstrap.Load(path, func() {
+			log.Println("DEBUG: Success, now what?")
 			// on success --> notify of done
 			wg.Done()
 			loadTinzenite(path)
@@ -31,6 +32,7 @@ func bootstrapTinzenite(path string) {
 	} else {
 		peerName := getString("Enter the peer name for this Tinzenite directory:")
 		boot, err := bootstrap.Create(path, peerName, func() {
+			log.Println("DEBUG: Success, now what?")
 			// on success --> notify of done
 			wg.Done()
 			loadTinzenite(path)
@@ -54,6 +56,7 @@ func bootstrapTinzenite(path string) {
 	}
 	// wait for successful bootstrap
 	wg.Wait()
+	log.Println("DEBUG: can it be that this kills the successful function, leaving tinzenite hanging?")
 }
 
 func createTinzenite(path string) {
@@ -106,7 +109,7 @@ func runTinzenite(t *core.Tinzenite) {
 	signal.Notify(c, os.Interrupt)
 	for {
 		select {
-		case <-time.Tick(time.Duration(5) * time.Second):
+		case <-time.Tick(time.Duration(10) * time.Second):
 			if counter >= 5 {
 				counter = 0
 				err := t.SyncRemote()
@@ -133,6 +136,6 @@ allowPeer asks the user whether to accept the given peer.
 */
 func allowPeer(address string, wantsTrust bool) bool {
 	// TODO actually ask!
-	log.Println("TODO: Actually ask, for now accepting everything!")
+	log.Println("TODO: Actually ask, for now accepting everything!", address)
 	return true
 }
