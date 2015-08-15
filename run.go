@@ -4,16 +4,56 @@ package main
 loadTinzenite loads an existing Tinzenite directory and runs it.
 */import (
 	"fmt"
+	"github.com/tinzenite/bootstrap"
 	"github.com/tinzenite/core"
 	"github.com/tinzenite/shared"
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 )
 
 func bootstrapTinzenite(path string) {
-
+	// wait group so that the process will wait for a successful bootstrap
+	var wg sync.WaitGroup
+	wg.Add(1)
+	if shared.IsTinzenite(path) {
+		_, err := bootstrap.Load(path, func() {
+			// on success --> notify of done
+			wg.Done()
+			loadTinzenite(path)
+		})
+		if err != nil {
+			logMain("Bootstrap load error:", err.Error())
+			return
+		}
+	} else {
+		peerName := getString("Enter the peer name for this Tinzenite directory:")
+		boot, err := bootstrap.Create(path, peerName, func() {
+			// on success --> notify of done
+			wg.Done()
+			loadTinzenite(path)
+		})
+		if err != nil {
+			logMain("Bootstrap create error:", err.Error())
+			return
+		}
+		// connect to:
+		address := getString("Please enter the address of the peer to connect to:")
+		err = boot.Start(address)
+		if err != nil {
+			logMain("Bootstrap start error:", err.Error())
+			// return because we don't want to store a faulty bootstrap
+			return
+		}
+		err = boot.Store()
+		if err != nil {
+			logMain("Bootstrap store error:", err.Error())
+		}
+	}
+	// wait for successful bootstrap
+	wg.Wait()
 }
 
 func createTinzenite(path string) {
