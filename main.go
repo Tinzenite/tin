@@ -35,6 +35,8 @@ func main() {
 	default:
 		logMain("No command was chosen, so we'll do nothing.")
 	}
+	// if we reach this it means the client is closing.
+	logMain("Quitting.")
 }
 
 /*

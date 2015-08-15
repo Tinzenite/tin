@@ -7,6 +7,8 @@ loadTinzenite loads an existing Tinzenite directory and runs it.
 	"github.com/tinzenite/core"
 	"github.com/tinzenite/shared"
 	"log"
+	"os"
+	"os/signal"
 	"time"
 )
 
@@ -60,6 +62,8 @@ func runTinzenite(t *core.Tinzenite) {
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
 	// run update and sync in intervalls
 	var counter int
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 	for {
 		select {
 		case <-time.Tick(time.Duration(5) * time.Second):
@@ -76,6 +80,10 @@ func runTinzenite(t *core.Tinzenite) {
 			if err != nil {
 				logMain("SyncLocal error:", err.Error())
 			}
+		case <-c:
+			// on interrupt close tinzenite
+			t.Close()
+			return
 		} // select
 	} // for
 }
