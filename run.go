@@ -7,6 +7,7 @@ loadTinzenite loads an existing Tinzenite directory and runs it.
 	"github.com/tinzenite/core"
 	"github.com/tinzenite/shared"
 	"log"
+	"time"
 )
 
 func bootstrapTinzenite(path string) {
@@ -48,11 +49,35 @@ func loadTinzenite(path string) {
 	runTinzenite(tinzenite)
 }
 
+/*
+runTinzenite runs the given Tinzenite instance.
+
+TODO implement interrupts and close behaviour!
+*/
 func runTinzenite(t *core.Tinzenite) {
+	// print important info
 	address, _ := t.Address()
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
-	// TODO print all relevant info and start bg thread that keeps it running until killed
-	log.Println("TODO: implement RUN")
+	// run update and sync in intervalls
+	var counter int
+	for {
+		select {
+		case <-time.Tick(time.Duration(5) * time.Second):
+			if counter >= 5 {
+				counter = 0
+				err := t.SyncRemote()
+				if err != nil {
+					logMain("SyncRemote error:", err.Error())
+				}
+				continue
+			}
+			counter++
+			err := t.SyncLocal()
+			if err != nil {
+				logMain("SyncLocal error:", err.Error())
+			}
+		} // select
+	} // for
 }
 
 /*

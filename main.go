@@ -37,6 +37,12 @@ func main() {
 	}
 }
 
+/*
+getPath gets a path from the user, either manually entered or chosen from the
+known paths.
+
+TODO: rewrite, I call the same manual request in 3 places!
+*/
 func getPath() string {
 	// load available dirs
 	options, err := shared.ReadDirectoryList()
