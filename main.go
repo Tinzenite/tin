@@ -22,16 +22,14 @@ func main() {
 	command := cmdParse(commandString)
 	// TODO implement load as sane default where?
 	// make sure that path and command have been given, otherwise ask explicitely
-	if command != cmdNone {
-		log.Println("Command was given:", command)
-	} else {
-		log.Println("Default to load?")
+	if command == cmdNone {
+		// default to load
+		command = cmdLoad
 	}
-	if path != "" {
-		log.Println("Path was given:", path)
-	} else {
+	if path == "" {
 		log.Println("Need to ask for path!")
 	}
+	logMain("Will", command.String(), "Tinzenite at", path, ".")
 }
 
 func getCmd() cmd {
