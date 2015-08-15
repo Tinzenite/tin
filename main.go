@@ -16,38 +16,24 @@ func main() {
 	var path string
 	// write flag stuff
 	flag.StringVar(&path, "path", "", "File directory path in which to run the client.")
-	flag.StringVar(&commandString, "cmd", "none", "Command for the path: create, load, or bootstrap.")
+	flag.StringVar(&commandString, "cmd", "load", "Command for the path: create, load, or bootstrap. Default is load.")
 	// parse them
 	flag.Parse()
 	// need to do some additional work because flag doesn't allow custom enumeration variables
 	command := cmdParse(commandString)
-	// TODO implement load as sane default where?
-	// make sure that path and command have been given, otherwise ask explicitely
-	if command == cmdNone {
-		// default to load
-		command = cmdLoad
-	}
 	if path == "" {
 		path = getPath()
 	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
-}
-
-func getCmd() cmd {
-	opQuestion := createQuestion("(L)oad a Tinzenite directory, (C)reate one, or (B)ootstrap to an existing one?")
-	opQuestion.createAnswer(0, "l", "load")
-	opQuestion.createAnswer(1, "c", "create")
-	opQuestion.createAnswer(2, "b", "bootstrap")
-	switch opQuestion.ask() {
-	case 0:
-		return cmdLoad
-	case 1:
-		return cmdCreate
-	case 2:
-		return cmdBootstrap
+	switch command {
+	case cmdLoad:
+		loadTinzenite(path)
+	case cmdCreate:
+		createTinzenite(path)
+	case cmdBootstrap:
+		bootstrapTinzenite(path)
 	default:
-		log.Println("Question returned unknown operation!")
-		return cmdNone
+		logMain("No command was chosen, so we'll do nothing.")
 	}
 }
 
@@ -61,12 +47,20 @@ func getPath() string {
 	// if none saved --> ask for manual entry
 	if len(options) == 0 {
 		fmt.Println("No previous Tinzenite directories known.")
-		return getString("Enter path for new Tinzenite directory:")
+		return getString("Enter path for Tinzenite directory:")
 	}
 	newQueston := createYesNo("Choose from existing paths?")
 	// if no --> manual entry
 	if newQueston.ask() < 0 {
-		return getString("Enter path for new Tinzenite directory:")
+		return getString("Enter path for Tinzenite directory:")
+	}
+	// if only one choice then that is all they have
+	if len(options) == 1 {
+		useQuestion := createYesNo("Only one candidate: " + options[0] + ". Use it?")
+		if useQuestion.ask() < 0 {
+			return getString("Enter path for Tinzenite directory:")
+		}
+		return options[0]
 	}
 	fmt.Println("Available paths:")
 	for index, path := range options {
