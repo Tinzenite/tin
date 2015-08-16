@@ -24,6 +24,11 @@ func main() {
 	if path == "" {
 		path = getPath()
 	}
+	if !shared.FileExists(path) {
+		/*TODO offer creating it?*/
+		logMain("Path", path, "doesn't exist!")
+		return
+	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
 	switch command {
 	case cmdLoad:
@@ -91,7 +96,7 @@ func getPath() string {
 Log function that respects the AllowLogging flag.
 */
 func logMain(msg ...string) {
-	toPrint := []string{"MAIN:"}
+	toPrint := []string{"Main:"}
 	toPrint = append(toPrint, msg...)
 	log.Println(strings.Join(toPrint, " "))
 }

@@ -10,22 +10,16 @@ loadTinzenite loads an existing Tinzenite directory and runs it.
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"time"
 )
 
 func bootstrapTinzenite(path string) {
-	// wait group so that the process will wait for a successful bootstrap
-	var wg sync.WaitGroup
-	wg.Add(1)
 	var boot *bootstrap.Bootstrap
 	var err error
+	var done chan bool
 	if shared.IsTinzenite(path) {
 		boot, err = bootstrap.Load(path, func() {
-			log.Println("DEBUG: Success, now what?")
-			// on success --> notify of done
-			wg.Done()
-			loadTinzenite(path)
+			done <- true
 		})
 		if err != nil {
 			logMain("Bootstrap load error:", err.Error())
@@ -34,10 +28,7 @@ func bootstrapTinzenite(path string) {
 	} else {
 		peerName := getString("Enter the peer name for this Tinzenite directory:")
 		boot, err = bootstrap.Create(path, peerName, func() {
-			log.Println("DEBUG: Success, now what?")
-			// on success --> notify of done
-			wg.Done()
-			loadTinzenite(path)
+			done <- true
 		})
 		if err != nil {
 			logMain("Bootstrap create error:", err.Error())
@@ -60,8 +51,10 @@ func bootstrapTinzenite(path string) {
 	address, _ := boot.Address()
 	fmt.Printf("Bootstrapping.\nID: %s\n", address)
 	// wait for successful bootstrap
-	wg.Wait()
-	log.Println("DEBUG: can it be that this kills the successful function, leaving tinzenite hanging?")
+	<-done
+	log.Println("DEBUG: Success!")
+	// continue to executing the directory
+	loadTinzenite(path)
 }
 
 func createTinzenite(path string) {
@@ -118,6 +111,7 @@ func runTinzenite(t *core.Tinzenite) {
 		select {
 		case <-time.Tick(time.Duration(10) * time.Second):
 			if counter >= 5 {
+				log.Println("DEBUG: Model sync")
 				counter = 0
 				err := t.SyncRemote()
 				if err != nil {
@@ -125,6 +119,7 @@ func runTinzenite(t *core.Tinzenite) {
 				}
 				continue
 			}
+			log.Println("DEBUG: Update")
 			counter++
 			err := t.SyncLocal()
 			if err != nil {
