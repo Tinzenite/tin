@@ -72,6 +72,10 @@ func createTinzenite(path string) {
 		logMain("Creation error:", err.Error())
 		return
 	}
+	err = tinzenite.SyncLocal()
+	if err != nil {
+		logMain("Initial model sync error:", err.Error())
+	}
 	// run tinzenite until killed
 	runTinzenite(tinzenite)
 }
@@ -88,14 +92,16 @@ func loadTinzenite(path string) {
 		logMain("Loading error:", err.Error())
 		return
 	}
+	err = tinzenite.SyncLocal()
+	if err != nil {
+		logMain("Initial model sync error:", err.Error())
+	}
 	// run tinzenite until killed
 	runTinzenite(tinzenite)
 }
 
 /*
 runTinzenite runs the given Tinzenite instance.
-
-TODO implement interrupts and close behaviour!
 */
 func runTinzenite(t *core.Tinzenite) {
 	// do this here so that it is guaranteed to be set
