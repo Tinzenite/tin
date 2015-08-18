@@ -16,7 +16,7 @@ loadTinzenite loads an existing Tinzenite directory and runs it.
 func bootstrapTinzenite(path string) {
 	var boot *bootstrap.Bootstrap
 	var err error
-	var done chan bool
+	done := make(chan bool)
 	if shared.IsTinzenite(path) {
 		boot, err = bootstrap.Load(path, func() {
 			done <- true
@@ -52,7 +52,7 @@ func bootstrapTinzenite(path string) {
 	fmt.Printf("Bootstrapping.\nID: %s\n", address)
 	// wait for successful bootstrap
 	<-done
-	log.Println("DEBUG: Success!")
+	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
 	// continue to executing the directory
 	loadTinzenite(path)
 }
@@ -117,7 +117,7 @@ func runTinzenite(t *core.Tinzenite) {
 		select {
 		case <-time.Tick(time.Duration(10) * time.Second):
 			if counter >= 5 {
-				log.Println("DEBUG: Model sync")
+				// log.Println("DEBUG: Model sync")
 				counter = 0
 				err := t.SyncRemote()
 				if err != nil {
@@ -125,7 +125,7 @@ func runTinzenite(t *core.Tinzenite) {
 				}
 				continue
 			}
-			log.Println("DEBUG: Update")
+			// log.Println("DEBUG: Update")
 			counter++
 			err := t.SyncLocal()
 			if err != nil {
