@@ -64,8 +64,8 @@ func createTinzenite(path string) {
 	}
 	// get options
 	peerName := getString("Enter the peer name for this Tinzenite directory:")
-	userName := getString("Your username:")
-	password := getString("Enter a directory password:")
+	userName := getString("Enter your username:")
+	password := getString("Enter a password for this Tinzenite network:")
 	relPath := shared.CreatePathRoot(path)
 	tinzenite, err := core.CreateTinzenite(relPath.LastElement(), relPath.FullPath(), peerName, userName, password)
 	if err != nil {
