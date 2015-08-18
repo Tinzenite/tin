@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"runtime/pprof"
 	"strings"
 
 	"github.com/tinzenite/shared"
@@ -14,11 +16,22 @@ func main() {
 	// declare flags
 	var commandString string
 	var path string
+	var cpuProfileFile string
 	// write flag stuff
 	flag.StringVar(&path, "path", "", "File directory path in which to run the client.")
 	flag.StringVar(&commandString, "cmd", "load", "Command for the path: create, load, or bootstrap. Default is load.")
+	flag.StringVar(&cpuProfileFile, "profile", "", "By using this flag with a path, a cpu profile will be written to the given path.")
 	// parse them
 	flag.Parse()
+	// cpu profiling
+	if cpuProfileFile != "" {
+		f, err := os.Create(cpuProfileFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 	// need to do some additional work because flag doesn't allow custom enumeration variables
 	command := cmdParse(commandString)
 	if path == "" {
