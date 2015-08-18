@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"strings"
 
@@ -13,6 +14,10 @@ import (
 
 func main() {
 	log.Println("Starting client.")
+	// setup runtime
+	runtime.GOMAXPROCS(2)
+	// call with <1 doesn't set new value, just return current
+	log.Println("Running with", runtime.GOMAXPROCS(-1), "threads on", runtime.NumCPU(), "cores.")
 	// declare flags
 	var commandString string
 	var path string
