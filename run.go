@@ -53,6 +53,9 @@ func bootstrapTinzenite(path string) {
 	// wait for successful bootstrap
 	<-done
 	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
+	// manually close boot if we're done! It won't close itself!
+	_ = getString("TODO: replace this with a delay timer! Continue?")
+	boot.Close()
 	// continue to executing the directory
 	loadTinzenite(path)
 }
