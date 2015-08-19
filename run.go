@@ -52,11 +52,15 @@ func bootstrapTinzenite(path string) {
 	fmt.Printf("Bootstrapping.\nID: %s\n", address)
 	// wait for successful bootstrap
 	<-done
-	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
+	log.Println("Closing Bootstrap.")
+	// this is required before closing boot because ToxCore may still need to
+	// notify the other client that the file transfers are complete - this can
+	// take a few iterations, so we delay for a second to give it time to do that.
+	<-time.Tick(1 * time.Second)
 	// manually close boot if we're done! It won't close itself!
-	_ = getString("TODO: replace this with a delay timer! Continue?")
 	boot.Close()
 	// continue to executing the directory
+	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
 	loadTinzenite(path)
 }
 
