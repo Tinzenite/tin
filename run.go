@@ -124,7 +124,8 @@ func runTinzenite(t *core.Tinzenite) {
 		select {
 		case <-time.Tick(time.Duration(10) * time.Second):
 			if counter >= 5 {
-				// log.Println("DEBUG: Model sync")
+				// TODO remove once Merge bug is fixed
+				log.Println("DEBUG: Model sync ---------------------------")
 				counter = 0
 				err := t.SyncRemote()
 				if err != nil {
