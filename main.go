@@ -19,7 +19,7 @@ func main() {
 	var cpuProfileFile string
 	// write flag stuff
 	flag.StringVar(&path, "path", "", "File directory path in which to run the client.")
-	flag.StringVar(&commandString, "cmd", "load", "Command for the path: create, load, or bootstrap. Default is load.")
+	flag.StringVar(&commandString, "cmd", "load", "Command for the path: create, load, or bootstrap (short: boot). Default is load.")
 	flag.StringVar(&cpuProfileFile, "profile", "", "By using this flag with a path, a cpu profile will be written to the given path.")
 	// parse them
 	flag.Parse()
@@ -31,6 +31,10 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
+	}
+	// replace short form with long form
+	if commandString == "boot" {
+		commandString = "bootstrap"
 	}
 	// need to do some additional work because flag doesn't allow custom enumeration variables
 	command := cmdParse(commandString)
