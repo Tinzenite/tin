@@ -121,13 +121,14 @@ func runTinzenite(t *core.Tinzenite) {
 	var counter int
 	// only build this once instead of every time
 	tickSpan := time.Duration(10) * time.Second
+	ticker := time.Tick(tickSpan)
 	// prepare quitting via ctrl-c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	// loop until close
 	for {
 		select {
-		case <-time.Tick(tickSpan):
+		case <-ticker:
 			if counter >= 5 {
 				// TODO remove once Merge bug is fixed
 				log.Println("DEBUG: Model sync ---------------------------")
