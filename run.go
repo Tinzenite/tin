@@ -117,35 +117,32 @@ func runTinzenite(t *core.Tinzenite) {
 	address, _ := t.Address()
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
 	// run update and sync in intervalls
-	// var counter int
+	var counter int
+	// only build this once instead of every time
+	tickSpan := time.Duration(10) * time.Second
+	// prepare quitting via ctrl-c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
+	// loop until close
 	for {
 		select {
-		case <-time.Tick(time.Duration(10) * time.Second):
-			log.Println("DEBUG: Model sync ---------------------------")
-			err := t.SyncRemote()
-			if err != nil {
-				logMain("SyncRemote error:", err.Error())
-			}
-			/*
-				if counter >= 5 {
-					// TODO remove once Merge bug is fixed
-					log.Println("DEBUG: Model sync ---------------------------")
-					counter = 0
-					err := t.SyncRemote()
-					if err != nil {
-						logMain("SyncRemote error:", err.Error())
-					}
-					continue
-				}
-				// log.Println("DEBUG: Update")
-				counter++
-				err := t.SyncLocal()
+		case <-time.Tick(tickSpan):
+			if counter >= 5 {
+				// TODO remove once Merge bug is fixed
+				log.Println("DEBUG: Model sync ---------------------------")
+				counter = 0
+				err := t.SyncRemote()
 				if err != nil {
-					logMain("SyncLocal error:", err.Error())
+					logMain("SyncRemote error:", err.Error())
 				}
-			*/
+				continue
+			}
+			// log.Println("DEBUG: Update")
+			counter++
+			err := t.SyncLocal()
+			if err != nil {
+				logMain("SyncLocal error:", err.Error())
+			}
 		case <-c:
 			// on interrupt close tinzenite
 			t.Close()
