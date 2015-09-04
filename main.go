@@ -16,9 +16,11 @@ func main() {
 	// declare flags
 	var commandString string
 	var path string
+	var password string
 	var cpuProfileFile string
 	// write flag stuff
 	flag.StringVar(&path, "path", "", "File directory path in which to run the client.")
+	flag.StringVar(&password, "pwd", "", "Password for loading or creating peers.")
 	flag.StringVar(&commandString, "cmd", "load", "Command for the path: create, load, or bootstrap (short: boot). Default is load.")
 	flag.StringVar(&cpuProfileFile, "profile", "", "By using this flag with a path, a cpu profile will be written to the given path.")
 	// parse them
@@ -46,10 +48,13 @@ func main() {
 		logMain("Path", path, "doesn't exist!")
 		return
 	}
+	if command != cmdBootstrap && password == "" {
+		password = getPassword()
+	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
 	switch command {
 	case cmdLoad:
-		loadTinzenite(path)
+		loadTinzenite(path, password)
 	case cmdCreate:
 		createTinzenite(path)
 	case cmdBootstrap:
@@ -107,6 +112,10 @@ func getPath() string {
 		fmt.Println("Invalid choice. Choose between 1 and the maximum!")
 	}
 	return options[pathIndex]
+}
+
+func getPassword() string {
+	return getString("Please enter the directory password:")
 }
 
 /*

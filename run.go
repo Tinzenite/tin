@@ -61,7 +61,9 @@ func bootstrapTinzenite(path string) {
 	boot.Close()
 	// continue to executing the directory
 	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
-	loadTinzenite(path)
+	// load tinzenite with password
+	password := getPassword()
+	loadTinzenite(path, password)
 }
 
 func createTinzenite(path string) {
@@ -87,12 +89,11 @@ func createTinzenite(path string) {
 	runTinzenite(tinzenite)
 }
 
-func loadTinzenite(path string) {
+func loadTinzenite(path, password string) {
 	if !shared.IsTinzenite(path) {
 		logMain("Directory is not a valid Tinzenite directory!")
 		return
 	}
-	password := getString("Please enter the directory password:")
 	tinzenite, err := core.LoadTinzenite(path, password)
 	if err != nil {
 		// TODO catch wrong password and allow retry
