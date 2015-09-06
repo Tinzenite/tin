@@ -43,17 +43,31 @@ func main() {
 	if path == "" {
 		path = getPath()
 	}
-	if !shared.FileExists(path) {
-		/*TODO offer creating it?*/
-		logMain("Path", path, "doesn't exist!")
+	// make sure we get at least a simple path
+	if path == "" {
+		logMain("No path given!")
 		return
 	}
-	if command != cmdBootstrap && password == "" {
-		password = getPassword()
+	// check if path exists
+	if !shared.FileExists(path) {
+		// offer creating it
+		if createYesNo("Path <"+path+"> doesn't exist. Create it?").ask() < 0 {
+			// explain why we're quitting
+			logMain("Can not run Tinzenite without valid path.")
+			return
+		}
+		// create it
+		logMain("Creating path <" + path + ">.")
+		shared.MakeDirectory(path)
+		// and continue below
 	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
 	switch command {
 	case cmdLoad:
+		// get password if not given yet (the other options will ask themselves)
+		if password == "" {
+			password = getPassword()
+		}
 		loadTinzenite(path, password)
 	case cmdCreate:
 		createTinzenite(path)
