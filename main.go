@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime/pprof"
 	"strings"
 
@@ -40,11 +41,15 @@ func main() {
 	}
 	// need to do some additional work because flag doesn't allow custom enumeration variables
 	command := cmdParse(commandString)
+	// do some path work
 	if path == "" {
+		// if empty get it
 		path = getPath()
 	}
-	// make sure we get at least a simple path
-	if path == "" {
+	// make sure the path is clean and absolute
+	path, _ = filepath.Abs(filepath.Clean(path))
+	// path may not be empty OR only contain '.' (which means error in filepath)
+	if path == "" || path == "." {
 		logMain("No path given!")
 		return
 	}
