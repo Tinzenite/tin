@@ -54,7 +54,7 @@ func main() {
 		return
 	}
 	// check if path exists
-	if !shared.FileExists(path) {
+	if exists, _ := shared.DirectoryExists(path); !exists {
 		// offer creating it
 		if createYesNo("Path <"+path+"> doesn't exist. Create it?").ask() < 0 {
 			// explain why we're quitting
