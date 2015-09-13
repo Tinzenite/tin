@@ -26,7 +26,7 @@ func bootstrapTinzenite(path string) {
 			return
 		}
 	} else {
-		peerName := getString("Enter the peer name for this Tinzenite directory:")
+		peerName := shared.GetString("Enter the peer name for this Tinzenite directory:")
 		boot, err = bootstrap.Create(path, peerName, func() {
 			done <- true
 		})
@@ -35,7 +35,7 @@ func bootstrapTinzenite(path string) {
 			return
 		}
 		// connect to:
-		address := getString("Please enter the address of the peer to connect to:")
+		address := shared.GetString("Please enter the address of the peer to connect to:")
 		err = boot.Start(address)
 		if err != nil {
 			logMain("Bootstrap start error:", err.Error())
@@ -72,9 +72,9 @@ func createTinzenite(path string) {
 		return
 	}
 	// get options
-	peerName := getString("Enter the peer name for this Tinzenite directory:")
-	userName := getString("Enter your username:")
-	password := getString("Enter a password for this Tinzenite network:")
+	peerName := shared.GetString("Enter the peer name for this Tinzenite directory:")
+	userName := shared.GetString("Enter your username:")
+	password := shared.GetString("Enter a password for this Tinzenite network:")
 	relPath := shared.CreatePathRoot(path)
 	tinzenite, err := core.CreateTinzenite(relPath.LastElement(), relPath.FullPath(), peerName, userName, password)
 	if err != nil {

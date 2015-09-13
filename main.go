@@ -56,7 +56,7 @@ func main() {
 	// check if path exists
 	if exists, _ := shared.DirectoryExists(path); !exists {
 		// offer creating it
-		if createYesNo("Path <"+path+"> doesn't exist. Create it?").ask() < 0 {
+		if shared.CreateYesNo("Path <"+path+"> doesn't exist. Create it?").Ask() < 0 {
 			// explain why we're quitting
 			logMain("Can not run Tinzenite without valid path.")
 			return
@@ -101,18 +101,18 @@ func getPath() string {
 	// if none saved --> ask for manual entry
 	if len(options) == 0 {
 		fmt.Println("No previous Tinzenite directories known.")
-		return getString("Enter path for Tinzenite directory:")
+		return shared.GetString("Enter path for Tinzenite directory:")
 	}
-	newQueston := createYesNo("Choose from existing paths?")
+	newQueston := shared.CreateYesNo("Choose from existing paths?")
 	// if no --> manual entry
-	if newQueston.ask() < 0 {
-		return getString("Enter path for Tinzenite directory:")
+	if newQueston.Ask() < 0 {
+		return shared.GetString("Enter path for Tinzenite directory:")
 	}
 	// if only one choice then that is all they have
 	if len(options) == 1 {
-		useQuestion := createYesNo("Only one candidate: " + options[0] + ". Use it?")
-		if useQuestion.ask() < 0 {
-			return getString("Enter path for Tinzenite directory:")
+		useQuestion := shared.CreateYesNo("Only one candidate: " + options[0] + ". Use it?")
+		if useQuestion.Ask() < 0 {
+			return shared.GetString("Enter path for Tinzenite directory:")
 		}
 		return options[0]
 	}
@@ -123,7 +123,7 @@ func getPath() string {
 	}
 	var pathIndex int
 	for {
-		pathIndex = getInt("Enter the corresponding number to choose a path:")
+		pathIndex = shared.GetInt("Enter the corresponding number to choose a path:")
 		pathIndex-- // need to subtract one to undo human readable numbers
 		if pathIndex >= 0 && pathIndex < len(options) {
 			break
@@ -134,7 +134,7 @@ func getPath() string {
 }
 
 func getPassword() string {
-	return getString("Please enter the directory password:")
+	return shared.GetString("Please enter the directory password:")
 }
 
 /*
