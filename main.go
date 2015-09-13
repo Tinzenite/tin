@@ -40,7 +40,7 @@ func main() {
 		commandString = "bootstrap"
 	}
 	// need to do some additional work because flag doesn't allow custom enumeration variables
-	command := cmdParse(commandString)
+	command := shared.CmdParse(commandString)
 	// do some path work
 	if path == "" {
 		// if empty get it
@@ -68,15 +68,15 @@ func main() {
 	}
 	logMain("Will", command.String(), "Tinzenite at", path, ".")
 	switch command {
-	case cmdLoad:
+	case shared.CmdLoad:
 		// get password if not given yet (the other options will ask themselves)
 		if password == "" {
 			password = getPassword()
 		}
 		loadTinzenite(path, password)
-	case cmdCreate:
+	case shared.CmdCreate:
 		createTinzenite(path)
-	case cmdBootstrap:
+	case shared.CmdBootstrap:
 		bootstrapTinzenite(path)
 	default:
 		logMain("No command was chosen, so we'll do nothing.")
