@@ -113,7 +113,26 @@ runTinzenite runs the given Tinzenite instance.
 */
 func runTinzenite(t *core.Tinzenite) {
 	// do this here so that it is guaranteed to be set
-	t.RegisterPeerValidation(allowPeer)
+	t.RegisterPeerValidation(func(address string, wantsTrust bool) {
+		var allow bool
+		if wantsTrust {
+			question := shared.CreateYesNo("Add peer " + address[:8] + " as TRUSTED peer?")
+			allow = question.Ask() > 0
+		} else {
+			question := shared.CreateYesNo("Add peer " + address[:8] + " as ENCRYPTED peer?")
+			allow = question.Ask() > 0
+		}
+		if !allow {
+			log.Println("Tin: will not add peer, as requested.")
+			return
+		}
+		// allow peer
+		err := t.AllowPeer(address)
+		if err != nil {
+			log.Println("Tinzenite: failed to allow peer:", err)
+		}
+		log.Println("Tin: will allowing peer, as requested.")
+	})
 	// print important info
 	address, _ := t.Address()
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
@@ -151,17 +170,4 @@ func runTinzenite(t *core.Tinzenite) {
 			return
 		} // select
 	} // for
-}
-
-/*
-allowPeer asks the user whether to accept the given peer.
-*/
-func allowPeer(address string, wantsTrust bool) bool {
-	// TODO shouldn't block... how? Call silent add friend on success?
-	if wantsTrust {
-		question := shared.CreateYesNo("Add peer " + address[:8] + " as TRUSTED peer?")
-		return question.Ask() > 0
-	}
-	question := shared.CreateYesNo("Add peer " + address[:8] + " as ENCRYPTED peer?")
-	return question.Ask() > 0
 }
