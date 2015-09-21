@@ -157,7 +157,11 @@ func runTinzenite(t *core.Tinzenite) {
 allowPeer asks the user whether to accept the given peer.
 */
 func allowPeer(address string, wantsTrust bool) bool {
-	// TODO actually ask! NOTE: shouldn't block... how? Call silent add friend on success?
-	log.Println("TODO: Actually ask, for now accepting everything!", address)
-	return true
+	// TODO shouldn't block... how? Call silent add friend on success?
+	if wantsTrust {
+		question := shared.CreateYesNo("Add peer " + address[:8] + " as TRUSTED peer?")
+		return question.Ask() > 0
+	}
+	question := shared.CreateYesNo("Add peer " + address[:8] + " as ENCRYPTED peer?")
+	return question.Ask() > 0
 }
