@@ -66,6 +66,11 @@ func bootstrapTinzenite(path string) {
 	<-time.Tick(1 * time.Second)
 	// manually close boot if we're done! It won't close itself!
 	boot.Close()
+	// IF w bootstrapped an encrypted peer, write that to the log and quit.
+	if !boot.IsTrusted() {
+		fmt.Println("Bootstrapping was successful. Run server to start encrypted peer.")
+		return
+	}
 	// continue to executing the directory
 	fmt.Println("Bootstrapping was successful. Loading Tinzenite.")
 	// load tinzenite with password
