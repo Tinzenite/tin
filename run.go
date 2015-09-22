@@ -131,7 +131,7 @@ func runTinzenite(t *core.Tinzenite) {
 		if err != nil {
 			log.Println("Tinzenite: failed to allow peer:", err)
 		}
-		log.Println("Tin: will allowing peer, as requested.")
+		log.Println("Tin: will allow peer, as requested.")
 	})
 	// print important info
 	address, _ := t.Address()
