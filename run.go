@@ -149,33 +149,31 @@ func runTinzenite(t *core.Tinzenite) {
 	// print important info
 	address, _ := t.Address()
 	fmt.Printf("Running peer <%s>.\nID: %s\n", t.Name(), address)
-	// run update and sync in intervalls
-	var counter int
-	// only build this once instead of every time
-	tickSpan := time.Duration(10) * time.Second
-	ticker := time.Tick(tickSpan)
+	// build ticks only once instead of every time
+	// FIXME: for now using prime numbers to keep them from all ticking at the same time
+	tickUpdate := time.Tick(time.Duration(7) * time.Second)
+	tickRemote := time.Tick(time.Duration(29) * time.Second)
+	tickEncrypted := time.Tick(time.Duration(53) * time.Second)
 	// prepare quitting via ctrl-c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	// loop until close
 	for {
 		select {
-		case <-ticker:
-			if counter >= 5 {
-				// TODO remove once Merge bug is fixed
-				log.Println("DEBUG: Model sync ---------------------------")
-				counter = 0
-				err := t.SyncRemote()
-				if err != nil {
-					logMain("SyncRemote error:", err.Error())
-				}
-				continue
-			}
-			// log.Println("DEBUG: Update")
-			counter++
+		case <-tickUpdate:
 			err := t.SyncLocal()
 			if err != nil {
 				logMain("SyncLocal error:", err.Error())
+			}
+		case <-tickRemote:
+			err := t.SyncRemote()
+			if err != nil {
+				logMain("SyncRemote error:", err.Error())
+			}
+		case <-tickEncrypted:
+			err := t.SyncEncrypted()
+			if err != nil {
+				logMain("SyncEncrypted error:", err.Error())
 			}
 		case <-c:
 			// on interrupt close tinzenite
