@@ -17,7 +17,8 @@ func bootstrapTinzenite(path string) {
 	var boot *bootstrap.Bootstrap
 	var err error
 	done := make(chan bool)
-	if shared.IsTinzenite(path) {
+	// if tinzenite OR encrypted we can just load the previous bootstrap
+	if shared.IsTinzenite(path) || shared.IsEncrypted(path) {
 		boot, err = bootstrap.Load(path, func() {
 			done <- true
 		})
