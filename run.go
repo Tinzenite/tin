@@ -26,8 +26,15 @@ func bootstrapTinzenite(path string) {
 			return
 		}
 	} else {
+		// ask whether this is supposed to be a trusted peer
+		question := shared.CreateYesNo("Is this a TRUSTED peer?")
+		trusted := question.Ask() > 0
+		// get peer name
 		peerName := shared.GetString("Enter the peer name for this Tinzenite directory:")
-		boot, err = bootstrap.Create(path, peerName, func() {
+		// get address to connect to BEFORE starting boot to avoid terminal clutter
+		address := shared.GetString("Please enter the address of the peer to connect to:")
+		// build object
+		boot, err = bootstrap.Create(path, peerName, trusted, func() {
 			done <- true
 		})
 		if err != nil {
@@ -35,13 +42,13 @@ func bootstrapTinzenite(path string) {
 			return
 		}
 		// connect to:
-		address := shared.GetString("Please enter the address of the peer to connect to:")
 		err = boot.Start(address)
 		if err != nil {
 			logMain("Bootstrap start error:", err.Error())
 			// return because we don't want to store a faulty bootstrap
 			return
 		}
+		// if everything ok, try storing this bootstrap
 		err = boot.Store()
 		if err != nil {
 			logMain("Bootstrap store error:", err.Error())
