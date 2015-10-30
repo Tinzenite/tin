@@ -16,12 +16,12 @@ loadTinzenite loads an existing Tinzenite directory and runs it.
 func bootstrapTinzenite(path string) {
 	var boot *bootstrap.Bootstrap
 	var err error
-	done := make(chan bool)
+	// done and onSuccess are used to determine when a bootstrap has completed
+	done := make(chan bool, 1)
+	onSuccess := func() { done <- true }
 	// if tinzenite OR encrypted we can just load the previous bootstrap
 	if shared.IsTinzenite(path) || shared.IsEncrypted(path) {
-		boot, err = bootstrap.Load(path, func() {
-			done <- true
-		})
+		boot, err = bootstrap.Load(path, onSuccess)
 		if err != nil {
 			logMain("Bootstrap load error:", err.Error())
 			return
@@ -35,9 +35,7 @@ func bootstrapTinzenite(path string) {
 		// get address to connect to BEFORE starting boot to avoid terminal clutter
 		address := shared.GetString("Please enter the address of the peer to connect to:")
 		// build object
-		boot, err = bootstrap.Create(path, peerName, trusted, func() {
-			done <- true
-		})
+		boot, err = bootstrap.Create(path, peerName, trusted, onSuccess)
 		if err != nil {
 			logMain("Bootstrap create error:", err.Error())
 			return
